@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/themes">
+        <file alias="dark_theme">resources/Eclippy.qss</file>
+    </qresource>
+    <qresource prefix="/shaders">
+        <file alias="PixelShader.hlsl">resources/PixelShader.hlsl</file>
+    </qresource>
+</RCC>
