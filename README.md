@@ -3,7 +3,8 @@
 ## Preview, edit and build assets for rSource games
 
 
-![image](https://user-images.githubusercontent.com/18037145/212479541-d88ae1c0-2365-4db8-bfe2-d990b267ce9c.png)
+![image](https://user-images.githubusercontent.com/18037145/212479814-6a86620e-204d-45c7-bb8c-f1a13e6a1795.png)
+
 
 ### Currently supported games
 
