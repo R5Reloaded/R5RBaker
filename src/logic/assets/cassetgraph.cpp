@@ -3,13 +3,14 @@
 CAssetGraph::CAssetGraph(QObject *parent)
     : QObject{parent}
 {
-    connect(this, &CAssetGraph::LinksChanged, this, &CAssetGraph::RebuildVirtualGraph);
+    connect(this, &CAssetGraph::GraphChanged, this, &CAssetGraph::RebuildVirtualGraph);
 }
 
 std::weak_ptr<CAsset> CAssetGraph::LoadAsset(CAsset *Asset)
 {
     std::shared_ptr<CAsset> ptr(Asset);
     LoadedAssets.push_back(ptr);
+    //connect(Asset, &QObject::propertyChanged, this, &CAssetGraph::LinksChanged);
     return std::weak_ptr(ptr);
 }
 
@@ -18,6 +19,7 @@ void CAssetGraph::UnloadAsset(std::weak_ptr<CAsset> Asset)
     LoadedAssets.removeIf([Asset](std::shared_ptr<CAsset> ptr) {
         return ptr == Asset.lock();
     });
+    emit GraphChanged();
 }
 
 
@@ -80,7 +82,7 @@ void CAssetGraph::AddLink(std::weak_ptr<CAsset> Parent, std::weak_ptr<CAsset> Ch
     Links[Parent].emplaceBack(forwardLink);
     Links[Child].emplaceBack(backLink);
 
-    emit LinksChanged();
+    emit GraphChanged();
 }
 
 void CAssetGraph::RemoveLink(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset> Asset2)
@@ -92,23 +94,22 @@ void CAssetGraph::RemoveLink(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset>
         return Link.Asset2.lock() == Asset1.lock() || Link.Asset2.lock() == Asset2.lock();
     });
 
-    emit LinksChanged();
+    emit GraphChanged();
 }
 
 void CAssetGraph::RebuildVirtualGraph() {
     *LogPane << "Rebuilding Virtual Graph";
 
-
     for (auto &p : VirtualGraph->Children) {
       p.reset();
-      *LogPane << (int)p.use_count();
     }
+
     VirtualGraph->Children.clear();
 
 
     emit VirtualGraphAboutToBeRebuilt();
     VirtualGraph->Children.clear();
-    for(std::weak_ptr<CAsset> asset : GetRootAssets()) {
+    for(std::weak_ptr<CAsset>& asset : GetRootAssets()) {
         VirtualGraph->Children.emplace_back(MakeGraphItemForAsset(asset, VirtualGraph));
     }
     emit VirtualGraphRebuilt();

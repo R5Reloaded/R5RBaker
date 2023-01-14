@@ -14,7 +14,7 @@ CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *pa
     }
 
     setWindowTitle(QString("%1 Links").arg(Asset->Name));
-    //setModal(true);
+    setModal(true);
 
     auto vbox = new QVBoxLayout(this);
     {
@@ -38,7 +38,7 @@ CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *pa
                 }
             };
             refreshChildrenList();
-            connect(AssetGraph, &CAssetGraph::LinksChanged, childrenList, [refreshChildrenList]() {
+            connect(AssetGraph, &CAssetGraph::GraphChanged, childrenList, [refreshChildrenList]() {
                 refreshChildrenList();
             });
         }
@@ -64,7 +64,7 @@ CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *pa
             };
 
             refreshParentsList();
-            connect(AssetGraph, &CAssetGraph::LinksChanged, parentsList, [refreshParentsList]() {
+            connect(AssetGraph, &CAssetGraph::GraphChanged, parentsList, [refreshParentsList]() {
                 refreshParentsList();
             });
         }

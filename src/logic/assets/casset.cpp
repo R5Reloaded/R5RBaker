@@ -1,32 +1,47 @@
 #include "casset.h"
 #include "../../windows/cassetlinksdialog.h"
+#include <QMenu>
+
+QString CAsset::getName() const
+{
+    return Name;
+}
+
+void CAsset::setName(const QString &newName)
+{
+    if (Name == newName)
+        return;
+    Name = newName;
+    emit NameChanged();
+}
 
 CAsset::CAsset(QString Name, QObject *parent)
     : QObject{parent}
 {
     srand(time(nullptr));
     this->Name = Name;
+    setObjectName(Name);
 }
 
-void CAsset::buildContextMenu(QMenu *Menu, CGraphItem *associatedItem) {
-    auto hierarchyActions = Menu->addMenu("Hierarchy");
+void CAsset::buildMenu(QMenu *Menu)
+{
+    auto assetMenu = Menu->addMenu(QString("As %1").arg(metaObject()->className()));
+    auto linksMenuAction = assetMenu->addAction("View/Edit Links");
+    connect(linksMenuAction, &QAction::triggered, Menu, [this]() {
+        (new CAssetLinksDialog(weak_from_this(), nullptr))->show();
+    });
 
-    {
-        auto unlinkFromParentAction = hierarchyActions->addAction("Unlink From Parent");
-
-        connect(unlinkFromParentAction, &QAction::triggered, Menu, [associatedItem]() {
-            if(auto parent = associatedItem->Parent.lock(); parent != AssetGraph->VirtualGraph) {
-                AssetGraph->RemoveLink(associatedItem->Asset, parent->Asset);
-            }
-        });
-    }
-    {
-        auto relationsMenuAction = hierarchyActions->addAction("View/Edit Links");
-        connect(relationsMenuAction, &QAction::triggered, Menu, [this]() {
-            (new CAssetLinksDialog(weak_from_this(), nullptr))->show();
-        });
-    }
+    auto unloadAssetAction = assetMenu->addAction("Unload");
+    connect(unloadAssetAction, &QAction::triggered, Menu, [this]() {
+        AssetGraph->UnloadAsset(weak_from_this());
+    });
 
 
-    _buildContextMenu(Menu);
+    _buildMenu(assetMenu);
+}
+
+
+QObject* CAsset::getPropertiesObject(QPoint pos)
+{
+    return this;
 }

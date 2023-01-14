@@ -6,7 +6,7 @@
 #include <QMenu>
 #include <QActionGroup>
 
-class CDependencyTreeView : public QTreeView
+class CDependencyTreeView : public QTreeView, public IHasProperties
 {
     Q_OBJECT
 public:
@@ -15,6 +15,10 @@ public:
     // QWidget interface
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
+
+    // IHasProperties interface
+public:
+    QObject *getPropertiesObject(QPoint pos) override;
 };
 
 #endif // CDEPENDENCYTREEVIEW_H

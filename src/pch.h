@@ -1,6 +1,9 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include "interfaces/IHasProperties.h"
+#include "interfaces/IHasActions.h"
+
 #include "utils/docking.h"
 #include "utils/macros.h"
 #include "utils/structs.h"

@@ -1,6 +1,6 @@
 #include "crpak.h"
 
-void CRPak::_buildContextMenu(QMenu *Menu)
+void CRPak::_buildMenu(QMenu *Menu)
 {
 
 }

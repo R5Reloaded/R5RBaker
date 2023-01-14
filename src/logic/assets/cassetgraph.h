@@ -1,6 +1,7 @@
 #ifndef CASSETGRAPH_H
 #define CASSETGRAPH_H
 
+#include <QMenu>
 #include <QObject>
 
 
@@ -40,10 +41,35 @@ struct CLink {
     }
 };
 
-struct CGraphItem {
+struct CGraphItem : public IHasProperties, public IHasActions {
     std::weak_ptr<CGraphItem> Parent;
     std::weak_ptr<CAsset> Asset;
     std::vector<std::shared_ptr<CGraphItem>> Children;
+
+    virtual QObject* getPropertiesObject(QPoint pos) override {
+        std::shared_ptr<CAsset> asset = Asset.lock();
+        if(asset) {
+            return asset->getPropertiesObject(pos);
+        } else {
+            return nullptr;
+        }
+    }
+
+    virtual void buildMenu(QMenu* Menu) override {
+//        auto hierarchyActions = Menu->addMenu("Hierarchy");
+
+//            {
+//                auto unlinkFromParentAction = hierarchyActions->addAction("Unlink From Parent");
+
+//                QApplication::connect(unlinkFromParentAction, &QAction::triggered, Menu, [this]() {
+//                    if(auto parent = this->Parent.lock(); parent != AssetGraph->VirtualGraph) {
+//                        AssetGraph->RemoveLink(this->Asset, parent->Asset);
+//                    }
+//                });
+//            }
+
+        // TODO
+    }
 };
 
 class CAssetGraph : public QObject
@@ -78,7 +104,7 @@ public:
     std::shared_ptr<CGraphItem> MakeGraphItemForAsset(std::weak_ptr<CAsset> Asset, std::shared_ptr<CGraphItem> Parent);
 
 signals:
-    void LinksChanged();
+    void GraphChanged();
     void VirtualGraphAboutToBeRebuilt();
     void VirtualGraphRebuilt();
 

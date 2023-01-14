@@ -2,15 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "DockManager.h"
-#include "DockAreaWidget.h"
 #include <QPlainTextEdit>
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 private:
-    ads::CDockManager *dockManager;
+    class ads::CDockManager *dockManager;
+    class CInspectorPane* inspectorPane;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -18,5 +18,12 @@ public:
 
 signals:
 
+
+    // QWidget interface
+protected:
+
+    // QObject interface
+public:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };
 #endif // MAINWINDOW_H

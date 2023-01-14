@@ -16,14 +16,19 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         src/main.cpp
+
+	src/interfaces/IHasProperties.h
+	src/interfaces/IHasActions.h
+
 	src/windows/mainwindow.cpp src/windows/mainwindow.h
 	src/windows/cassetlinksdialog.h src/windows/cassetlinksdialog.cpp
 
         src/panes/cfilesystempane.h src/panes/cfilesystempane.cpp
         src/panes/cdependencypane.h src/panes/cdependencypane.cpp
         src/panes/clogpane.h src/panes/clogpane.cpp
+	src/panes/cinspectorpane.h src/panes/cinspectorpane.cpp
 
-        src/editors/ctesteditor.h src/editors/ctesteditor.cpp
+	src/editors/ctesteditor.h src/editors/ctesteditor.cpp
 
         src/logic/assets/cassetgraph.h src/logic/assets/cassetgraph.cpp
         src/logic/assets/casset.h src/logic/assets/casset.cpp

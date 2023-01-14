@@ -11,7 +11,7 @@ public:
     explicit CRPak(QString Name, QObject *parent = nullptr);
     // CAsset interface
 private:
-    void _buildContextMenu(QMenu *Menu) override;
+    void _buildMenu(QMenu *Menu) override;
 };
 
 #endif // CRPAK_H
