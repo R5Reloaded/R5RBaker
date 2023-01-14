@@ -47,6 +47,7 @@ set(PROJECT_SOURCES
 )
 
 add_subdirectory(vendor/Qt-Advanced-Docking-System)
+add_subdirectory(vendor/tomlplusplus)
 
 qt_add_executable(R5RBaker
         MANUAL_FINALIZATION
@@ -54,6 +55,7 @@ qt_add_executable(R5RBaker
         )
 
 target_link_libraries(R5RBaker PRIVATE qtadvanceddocking)
+target_link_libraries(R5RBaker PRIVATE tomlplusplus)
 target_link_libraries(R5RBaker PRIVATE Qt6::Widgets)
 target_link_libraries(R5RBaker PRIVATE d3d11.lib)
 target_link_libraries(R5RBaker PRIVATE d3dcompiler.lib)
