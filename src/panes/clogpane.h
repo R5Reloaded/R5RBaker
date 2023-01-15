@@ -14,7 +14,6 @@ class CLogPane : public QWidget
 
     QListView* ListView;
     QStringListModel* ListModel;
-    QToolBar* ToolBar;
 
     QVector<QString> List;
 public:
@@ -22,10 +21,9 @@ public:
 
     CLogPane& operator<<(QVariant entry);
 
+    void clearLog();
 signals:
 
 };
-
-extern CLogPane* LogPane;
 
 #endif // CLOGPANE_H

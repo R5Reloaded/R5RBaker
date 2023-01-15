@@ -106,5 +106,4 @@ void CInspectorPane::updateObjectProperty(const QModelIndex &index, const QModel
 
     QStandardItem* itemName = Model->item(itemValue->row(), 0);
     CurrentObject->setProperty(itemName->text().toLatin1(), itemValue->data(Qt::EditRole));
-    AssetGraph->RebuildVirtualGraph();
 }

@@ -8,14 +8,35 @@
 #include <QLabel>
 #include <QTimer>
 
+void MainWindow::buildMenu()
+{
+    auto assetsMenu = menuBar()->addMenu("Assets");
+    auto logMenu = menuBar()->addMenu("Log");
+    /*auto preferencesMenu = */menuBar()->addMenu("Preferences");
+
+
+    auto clearLogAction = logMenu->addAction(style()->standardIcon(QStyle::SP_MessageBoxCritical), tr("&Clear Log"));
+    connect(clearLogAction, &QAction::triggered, LogPane, &CLogPane::clearLog);
+
+    auto newAssets = assetsMenu->addMenu("New Asset");
+
+
+#define REGISTER_ASSET_ADD_MENU(type) \
+    newAssets->addAction("type", this, []() { \
+        AssetGraph->LoadAsset(new type("hey")); \
+    });
+
+    REGISTER_ASSET_ADD_MENU(CAsset);
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    setGeometry(700, 300, 1200, 800);
+    buildMenu();
+
     dockManager = new ads::CDockManager(this);
 
-    menuBar()->addMenu("File");
-    menuBar()->addMenu("Edit");
-    menuBar()->addMenu("Preferences");
 
     CTestEditor* testEditor = new CTestEditor();
     ads::CDockWidget* dockWidget3 = new ads::CDockWidget("Editor");

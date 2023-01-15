@@ -55,6 +55,8 @@ struct CGraphItem : public IHasProperties, public IHasActions {
         }
     }
 
+    virtual void propertiesUpdated() override {}
+
     virtual void buildMenu(QMenu* Menu) override {
 //        auto hierarchyActions = Menu->addMenu("Hierarchy");
 
@@ -114,7 +116,5 @@ private:
 public slots:
     void RebuildVirtualGraph();
 };
-
-extern CAssetGraph* AssetGraph;
 
 #endif // CASSETGRAPH_H

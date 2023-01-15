@@ -19,6 +19,10 @@ protected:
     // IHasProperties interface
 public:
     QObject *getPropertiesObject(QPoint pos) override;
+
+    // IHasProperties interface
+public:
+    void propertiesUpdated() override;
 };
 
 #endif // CDEPENDENCYTREEVIEW_H

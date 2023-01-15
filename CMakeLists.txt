@@ -42,6 +42,7 @@ set(PROJECT_SOURCES
         src/utils/macros.h
         src/utils/docking.h
 	src/utils/structs.h
+	src/utils/globals.h
 
         resources.qrc
 )
@@ -55,7 +56,7 @@ qt_add_executable(R5RBaker
         )
 
 target_link_libraries(R5RBaker PRIVATE qtadvanceddocking)
-target_link_libraries(R5RBaker PRIVATE tomlplusplus)
+target_link_libraries(R5RBaker PRIVATE tomlplusplus_tomlplusplus)
 target_link_libraries(R5RBaker PRIVATE Qt6::Widgets)
 target_link_libraries(R5RBaker PRIVATE d3d11.lib)
 target_link_libraries(R5RBaker PRIVATE d3dcompiler.lib)

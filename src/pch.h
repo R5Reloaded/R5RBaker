@@ -1,6 +1,8 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include "utils/globals.h"
+
 #include "interfaces/IHasProperties.h"
 #include "interfaces/IHasActions.h"
 

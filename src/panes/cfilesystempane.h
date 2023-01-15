@@ -15,7 +15,6 @@ private:
     QFileSystemModel* fileSystemModel;
     QVBoxLayout* vbox;
     QTreeView* treeView;
-    QToolBar* toolbar;
 public:
     explicit CFileSystemPane(QWidget *parent = nullptr);
 

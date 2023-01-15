@@ -11,6 +11,7 @@ private:
     class ads::CDockManager *dockManager;
     class CInspectorPane* inspectorPane;
 
+    void buildMenu();
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

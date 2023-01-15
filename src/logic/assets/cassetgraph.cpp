@@ -1,5 +1,12 @@
 #include "cassetgraph.h"
 
+//
+//
+CAssetGraph* AssetGraph;
+//
+//
+
+
 CAssetGraph::CAssetGraph(QObject *parent)
     : QObject{parent}
 {
@@ -8,9 +15,13 @@ CAssetGraph::CAssetGraph(QObject *parent)
 
 std::weak_ptr<CAsset> CAssetGraph::LoadAsset(CAsset *Asset)
 {
+    if(!Asset) return std::shared_ptr<CAsset>();
+
     std::shared_ptr<CAsset> ptr(Asset);
     LoadedAssets.push_back(ptr);
-    //connect(Asset, &QObject::propertyChanged, this, &CAssetGraph::LinksChanged);
+
+    emit GraphChanged();
+
     return std::weak_ptr(ptr);
 }
 
@@ -55,9 +66,9 @@ QVector<std::weak_ptr<CAsset>> CAssetGraph::GetRootAssets() const
 {
     QVector<std::weak_ptr<CAsset>> Assets;
 
-    for(auto& kv : Links) {
-        if(IsRootAsset(kv.first))
-            Assets.push_back(kv.first);
+    for(auto& asset : LoadedAssets) {
+        if(IsRootAsset(asset))
+            Assets.push_back(asset);
     }
 
     return Assets;
@@ -65,7 +76,7 @@ QVector<std::weak_ptr<CAsset>> CAssetGraph::GetRootAssets() const
 
 bool CAssetGraph::IsRootAsset(std::weak_ptr<CAsset> Asset) const
 {
-    if(!Links.count(Asset)) return false;
+    if(!Links.count(Asset)) return true;
     for(auto& link : Links.at(Asset)) {
         if(link.Direction == CLink::Direction::CHILD_TO_PARENT)
             return false;
@@ -133,4 +144,3 @@ std::shared_ptr<CGraphItem> CAssetGraph::MakeGraphItemForAsset(std::weak_ptr<CAs
     return item;
 }
 
-CAssetGraph* AssetGraph = new CAssetGraph();

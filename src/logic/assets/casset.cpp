@@ -23,6 +23,11 @@ CAsset::CAsset(QString Name, QObject *parent)
     setObjectName(Name);
 }
 
+void CAsset::saveMeta()
+{
+
+}
+
 void CAsset::buildMenu(QMenu *Menu)
 {
     auto assetMenu = Menu->addMenu(QString("As %1").arg(metaObject()->className()));
@@ -44,4 +49,9 @@ void CAsset::buildMenu(QMenu *Menu)
 QObject* CAsset::getPropertiesObject(QPoint pos)
 {
     return this;
+}
+
+void CAsset::propertiesUpdated()
+{
+    AssetGraph->RebuildVirtualGraph();
 }

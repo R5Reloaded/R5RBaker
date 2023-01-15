@@ -41,3 +41,8 @@ QObject *CDependencyTreeView::getPropertiesObject(QPoint pos)
     }
     return nullptr;
 }
+
+void CDependencyTreeView::propertiesUpdated()
+{
+
+}
