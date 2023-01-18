@@ -27,12 +27,23 @@ std::weak_ptr<CAsset> CAssetGraph::LoadAsset(CAsset *Asset)
 
 void CAssetGraph::UnloadAsset(std::weak_ptr<CAsset> Asset)
 {
+    auto links = GetLinksForAsset(Asset);
+    for (auto& link : links) {
+        RemoveLink(link.Asset1, link.Asset2);
+    }
     LoadedAssets.removeIf([Asset](std::shared_ptr<CAsset> ptr) {
         return ptr == Asset.lock();
     });
     emit GraphChanged();
 }
 
+void CAssetGraph::ClearGraph()
+{
+    LoadedAssets.clear();
+    Links.clear();
+    VirtualGraph.reset();
+    emit GraphChanged();
+}
 
 QVector<CLink> CAssetGraph::GetLinksForAsset(std::weak_ptr<CAsset> Asset) const
 {
@@ -65,12 +76,19 @@ QVector<CLink> CAssetGraph::GetParentsLinksForAsset(std::weak_ptr<CAsset> Asset)
 QVector<std::weak_ptr<CAsset>> CAssetGraph::GetRootAssets() const
 {
     QVector<std::weak_ptr<CAsset>> Assets;
-
     for(auto& asset : LoadedAssets) {
         if(IsRootAsset(asset))
             Assets.push_back(asset);
     }
+    return Assets;
+}
 
+QVector<std::weak_ptr<CAsset>> CAssetGraph::GetAllAssets() const
+{
+    QVector<std::weak_ptr<CAsset>> Assets;
+    for(auto& asset : LoadedAssets) {
+            Assets.push_back(asset);
+    }
     return Assets;
 }
 
@@ -108,11 +126,23 @@ void CAssetGraph::RemoveLink(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset>
     emit GraphChanged();
 }
 
+bool CAssetGraph::AreLinked(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset> Asset2)
+{
+    auto links = GetLinksForAsset(Asset1);
+    for (const auto& link : links) {
+        if (link.Asset1.lock() == Asset2.lock() || link.Asset2.lock() == Asset2.lock()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void CAssetGraph::RebuildVirtualGraph() {
     *LogPane << "Rebuilding Virtual Graph";
 
     for (auto &p : VirtualGraph->Children) {
-      p.reset();
+        p.reset();
     }
 
     VirtualGraph->Children.clear();

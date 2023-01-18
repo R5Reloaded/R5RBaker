@@ -8,35 +8,40 @@ class CAsset : public QObject, public std::enable_shared_from_this<CAsset>, publ
 {
     Q_OBJECT
 
-    ASSET_META_PROPERTY(QString, mek)
 public:
+    Q_INVOKABLE explicit CAsset(QString Name, QObject *parent = nullptr);
+
     QString Name;
-    QString SavePath;
 
     QString getName() const;
     void setName(const QString &newName);
 
-
-    explicit CAsset(QString Name, QObject *parent = nullptr);
 
     virtual void buildBeforeChildren(){}
     virtual void buildAfterChildren(){}
 
     void saveMeta();
     void loadMeta();
+    void deleteMeta();
+    void moveMeta(QString newPath);
 
-    virtual void buildMenu(class QMenu* Menu) override;
-    virtual class QObject* getPropertiesObject(QPoint pos) override;
-    virtual void propertiesUpdated() override;
+
+    QString getMetaPath();
+
+    virtual void buildMenu(class QMenu* Menu) final override;
+    virtual class QObject* getPropertiesObject(QPoint pos) final override;
+    virtual void propertiesUpdated() final override;
 
 
 private:
-    virtual void _buildMenu(QMenu* Menu){}
-
     Q_PROPERTY(QString Name READ getName WRITE setName NOTIFY NameChanged)
 
+    virtual void _buildMenu(QMenu* Menu){}
 signals:
     void NameChanged();
+
 };
+
+Q_DECLARE_METATYPE(CAsset*)
 
 #endif // CASSET_H

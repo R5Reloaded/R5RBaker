@@ -89,22 +89,25 @@ public:
     void UnloadAsset(std::weak_ptr<CAsset> Asset);
 
 
-
     QVector<CLink> GetLinksForAsset(std::weak_ptr<CAsset> Asset) const;
     QVector<CLink> GetChildrenLinksForAsset(std::weak_ptr<CAsset> Asset) const;
     QVector<CLink> GetParentsLinksForAsset(std::weak_ptr<CAsset> Asset) const;
 
 
     QVector<std::weak_ptr<CAsset>> GetRootAssets() const;
+    QVector<std::weak_ptr<CAsset>> GetAllAssets() const;
+
     bool IsRootAsset(std::weak_ptr<CAsset> Asset) const;
 
 
     void AddLink(std::weak_ptr<CAsset> Parent, std::weak_ptr<CAsset> Child);
     void RemoveLink(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset> Asset2);
+    bool AreLinked(std::weak_ptr<CAsset> Asset1, std::weak_ptr<CAsset> Asset2);
 
 
     std::shared_ptr<CGraphItem> MakeGraphItemForAsset(std::weak_ptr<CAsset> Asset, std::shared_ptr<CGraphItem> Parent);
 
+    void ClearGraph();
 signals:
     void GraphChanged();
     void VirtualGraphAboutToBeRebuilt();

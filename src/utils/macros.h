@@ -1,6 +1,10 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <variant>
+#include <QDateTime>
+#include <QDate>
+#include <QTime>
 
 #define ASSET_META_PROPERTY(type, name)\
     Q_PROPERTY(type name READ get##name WRITE set##name NOTIFY name##Changed USER("saveToMeta=true"))\

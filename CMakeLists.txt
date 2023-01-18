@@ -21,7 +21,9 @@ set(PROJECT_SOURCES
 	src/interfaces/IHasActions.h
 
 	src/windows/mainwindow.cpp src/windows/mainwindow.h
-	src/windows/cassetlinksdialog.h src/windows/cassetlinksdialog.cpp
+	src/windows/cassetlinksdialog.h src/windows/cassetlinksdialog.cpp src/windows/cassetlinksdialog.ui
+	src/windows/cnewassetdialog.h src/windows/cnewassetdialog.cpp src/windows/cnewassetdialog.ui
+	src/windows/cbuildassetdialog.h src/windows/cbuildassetdialog.cpp src/windows/cbuildassetdialog.ui
 
         src/panes/cfilesystempane.h src/panes/cfilesystempane.cpp
         src/panes/cdependencypane.h src/panes/cdependencypane.cpp

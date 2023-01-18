@@ -1,13 +1,16 @@
 #include "cassetlinksdialog.h"
+#include "ui_cassetlinksdialog.h"
 
 #include <QDialogButtonBox>
 #include <QGroupBox>
 #include <QListWidget>
+#include <QMessageBox>
 
-CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *parent) : QDialog{parent}
+CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *parent) : QDialog{parent}, ui(new Ui::CAssetLinksDialog()), AssetPtr(AssetPtr)
 {
-    auto Asset = AssetPtr.lock().get();
+    ui->setupUi(this);
 
+    auto Asset = AssetPtr.lock().get();
     if(!Asset) {
         close();
         return;
@@ -16,60 +19,144 @@ CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *pa
     setWindowTitle(QString("%1 Links").arg(Asset->Name));
     setModal(true);
 
-    auto vbox = new QVBoxLayout(this);
-    {
-        {
-            auto childrenGroup = new QGroupBox("Children", this);
-            vbox->addWidget(childrenGroup);
+    refreshChildrenGroup();
+    refreshParentsGroup();
+}
 
-            auto vbox = new QVBoxLayout;
-            childrenGroup->setLayout(vbox);
+CAssetLinksDialog::~CAssetLinksDialog()
+{
+    delete ui;
+}
 
-            auto childrenList = new QListWidget;
-            vbox->addWidget(childrenList);
+void CAssetLinksDialog::refreshChildrenGroup()
+{
+    std::shared_ptr<CAsset> Asset = AssetPtr.lock();
+    if(!Asset) {
+        QMessageBox::critical(this, "Error", "Couldn't add link to Asset as it isn't loaded anymore!");
+        return;
+    }
 
-            auto refreshChildrenList = [Asset, AssetPtr, childrenList]() {
-                childrenList->clear();
-                for(auto& link : AssetGraph->GetLinksForAsset(AssetPtr)) {
-                    if(link.parent().lock().get() == Asset && link.child().lock()) {
-                        auto child = link.child().lock();
-                        childrenList->addItem(QString("%1: [%2]").arg(child->Name, child->metaObject()->className()));
-                    }
-                }
-            };
-            refreshChildrenList();
-            connect(AssetGraph, &CAssetGraph::GraphChanged, childrenList, [refreshChildrenList]() {
-                refreshChildrenList();
-            });
+    // CHILDREN LIST WIDGET
+
+    ui->ChildrenListWidget->clear();
+    for(auto& link : AssetGraph->GetLinksForAsset(AssetPtr)) {
+        if(link.parent().lock().get() == Asset.get() && link.child().lock()) {
+            auto child = link.child().lock();
+
+            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(child->Name, child->metaObject()->className()));
+            item->setData(Qt::UserRole, QVariant::fromValue(link.child()));
+            ui->ChildrenListWidget->addItem(item);
         }
+    }
 
-        {
-            auto parentsGroup = new QGroupBox("Parents", this);
-            vbox->addWidget(parentsGroup);
+    // CHILDREN ADD COMBO
 
-            auto vbox = new QVBoxLayout;
-            parentsGroup->setLayout(vbox);
+    ui->AddChildCombo->clear();
+    for(std::weak_ptr<CAsset>& assetPtr : AssetGraph->GetAllAssets()) {
+        auto otherAsset = assetPtr.lock();
 
-            auto parentsList = new QListWidget;
-            vbox->addWidget(parentsList);
+        if(otherAsset == Asset || AssetGraph->AreLinked(otherAsset, Asset))
+            continue;
 
-            auto refreshParentsList = [Asset, AssetPtr, parentsList]() {
-                parentsList->clear();
-                for(auto& link : AssetGraph->GetLinksForAsset(AssetPtr)) {
-                    if(link.child().lock().get() == Asset && link.parent().lock()) {
-                        auto parent = link.parent().lock();
-                        parentsList->addItem(QString("%1: [%2]").arg(parent->Name, parent->metaObject()->className()));
-                    }
-                }
-            };
+        ui->AddChildCombo->addItem(QString("%1: [%2]").arg(otherAsset->Name, otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
+    }
 
-            refreshParentsList();
-            connect(AssetGraph, &CAssetGraph::GraphChanged, parentsList, [refreshParentsList]() {
-                refreshParentsList();
-            });
+}
+
+void CAssetLinksDialog::refreshParentsGroup()
+{
+    std::shared_ptr<CAsset> Asset = AssetPtr.lock();
+    if(!Asset) {
+        QMessageBox::critical(this, "Error", "Couldn't add link to Asset as it isn't loaded anymore!");
+        return;
+    }
+
+    // PARENTS LIST WIDGET
+
+    ui->ParentsListWidget->clear();
+    for(auto& link : AssetGraph->GetLinksForAsset(AssetPtr)) {
+        if(link.child().lock().get() == Asset.get() && link.parent().lock()) {
+            auto parent = link.parent().lock();
+
+            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(parent->Name, parent->metaObject()->className()));
+            item->setData(Qt::UserRole, QVariant::fromValue(link.parent()));
+            ui->ParentsListWidget->addItem(item);
         }
+    }
 
+    // PARENTS ADD COMBO
 
+    ui->AddParentCombo->clear();
+    for(std::weak_ptr<CAsset>& assetPtr : AssetGraph->GetAllAssets()) {
+        auto otherAsset = assetPtr.lock();
 
+        if(otherAsset == Asset || AssetGraph->AreLinked(otherAsset, Asset))
+            continue;
+
+        ui->AddParentCombo->addItem(QString("%1: [%2]").arg(otherAsset->Name, otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
     }
 }
+
+void CAssetLinksDialog::on_AddChildLinkButton_clicked()
+{
+    if(ui->AddChildCombo->currentData().isValid()) {
+        std::weak_ptr<CAsset> otherAssetPtr = ui->AddChildCombo->currentData().value<std::weak_ptr<CAsset>>();
+        if(auto otherAsset = otherAssetPtr.lock(); otherAsset) {
+            AssetGraph->AddLink(AssetPtr, otherAssetPtr);
+        }
+    }
+    refreshChildrenGroup();
+}
+
+
+void CAssetLinksDialog::on_AddParentLinkButton_clicked()
+{
+    if(ui->AddParentCombo->currentData().isValid()) {
+        std::weak_ptr<CAsset> otherAssetPtr = ui->AddParentCombo->currentData().value<std::weak_ptr<CAsset>>();
+        if(auto otherAsset = otherAssetPtr.lock(); otherAsset) {
+            AssetGraph->AddLink(otherAssetPtr, AssetPtr);
+        }
+    }
+    refreshParentsGroup();
+}
+
+
+void CAssetLinksDialog::on_ChildrenListWidget_customContextMenuRequested(const QPoint &pos)
+{
+    auto item = ui->ChildrenListWidget->itemAt(pos);
+    if(!item) return;
+    std::weak_ptr<CAsset> otherAssetPtr = item->data(Qt::UserRole).value<std::weak_ptr<CAsset>>();
+    if(otherAssetPtr.expired()) return;
+
+    QMenu* menu = new QMenu(this);
+    QAction* removeAction = menu->addAction("Remove");
+
+    connect(removeAction, &QAction::triggered, this, [this, otherAssetPtr]() {
+        AssetGraph->RemoveLink(AssetPtr, otherAssetPtr);
+        refreshChildrenGroup();
+    });
+
+    menu->exec(ui->ChildrenListWidget->mapToGlobal(pos));
+    delete menu;
+}
+
+
+void CAssetLinksDialog::on_ParentsListWidget_customContextMenuRequested(const QPoint &pos)
+{
+    auto item = ui->ParentsListWidget->itemAt(pos);
+    if(!item) return;
+    std::weak_ptr<CAsset> otherAssetPtr = item->data(Qt::UserRole).value<std::weak_ptr<CAsset>>();
+    if(otherAssetPtr.expired()) return;
+
+    QMenu* menu = new QMenu(this);
+    QAction* removeAction = menu->addAction("Remove");
+
+    connect(removeAction, &QAction::triggered, this, [this, otherAssetPtr]() {
+        AssetGraph->RemoveLink(AssetPtr, otherAssetPtr);
+        refreshParentsGroup();
+    });
+
+    menu->exec(ui->ParentsListWidget->mapToGlobal(pos));
+    delete menu;
+}
+

@@ -12,7 +12,7 @@ CFileSystemPane::CFileSystemPane(QWidget *parent)
 
     vbox->addWidget(treeView);
 
-    QString AppData = *WorkingDirectory;
+    QString AppData = WorkingDirectory->path();
     QDir AppDataDir(AppData);
 
     if(!AppDataDir.exists()) {

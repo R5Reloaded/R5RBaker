@@ -5,18 +5,6 @@
 CAssetGraphModel::CAssetGraphModel(QObject *parent)
     : QAbstractItemModel{parent}
 {
-    auto asset1 = AssetGraph->LoadAsset(new CAsset("Asset1"));
-    auto asset2 = AssetGraph->LoadAsset(new CAsset("Asset2"));
-    auto asset3 = AssetGraph->LoadAsset(new CAsset("Asset3"));
-    auto asset4 = AssetGraph->LoadAsset(new CAsset("Asset4"));
-    auto asset5 = AssetGraph->LoadAsset(new CAsset("Asset5"));
-
-    AssetGraph->AddLink(asset1, asset2);
-    AssetGraph->AddLink(asset3, asset2);
-    AssetGraph->AddLink(asset2, asset5);
-    AssetGraph->AddLink(asset3, asset4);
-    AssetGraph->AddLink(asset3, asset5);
-
     connect(AssetGraph, &CAssetGraph::VirtualGraphAboutToBeRebuilt, this, &CAssetGraphModel::beginResetModel);
     connect(AssetGraph, &CAssetGraph::VirtualGraphRebuilt, this, &CAssetGraphModel::endResetModel);
 

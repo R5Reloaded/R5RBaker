@@ -14,4 +14,6 @@
 #include "logic/assets/cassetgraph.h"
 
 #include "panes/clogpane.h"
+
+#include <toml++/toml.h>
 #endif // PCH_H

@@ -20,6 +20,7 @@ CLogPane::CLogPane(QWidget *parent)
 
 CLogPane& CLogPane::operator<<(QVariant entry)
 {
+    qDebug() << entry;
     if(ListModel->insertRow(ListModel->rowCount())) {
         QModelIndex index = ListModel->index(ListModel->rowCount() - 1, 0);
         ListModel->setData(index, entry);

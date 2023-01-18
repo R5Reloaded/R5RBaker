@@ -4,6 +4,7 @@
 #include "../panes/cinspectorpane.h"
 #include "../editors/ctesteditor.h"
 #include "DockAreaWidget.h"
+#include "cnewassetdialog.h"
 #include <QMenuBar>
 #include <QLabel>
 #include <QTimer>
@@ -18,15 +19,36 @@ void MainWindow::buildMenu()
     auto clearLogAction = logMenu->addAction(style()->standardIcon(QStyle::SP_MessageBoxCritical), tr("&Clear Log"));
     connect(clearLogAction, &QAction::triggered, LogPane, &CLogPane::clearLog);
 
-    auto newAssets = assetsMenu->addMenu("New Asset");
-
-
-#define REGISTER_ASSET_ADD_MENU(type) \
-    newAssets->addAction("type", this, []() { \
-        AssetGraph->LoadAsset(new type("hey")); \
+    QAction* newAssets = assetsMenu->addAction("Create New Asset");
+    connect(newAssets, &QAction::triggered, this, [this]() {
+       auto newAssetDialog = new CNewAssetDialog(this);
+       newAssetDialog->exec();
+       delete newAssetDialog;
     });
 
-    REGISTER_ASSET_ADD_MENU(CAsset);
+
+    QAction* saveAssets = assetsMenu->addAction("Save All Assets");
+    connect(saveAssets, &QAction::triggered, this, []() {
+       for(auto& i : AssetGraph->GetAllAssets()) {
+           if(auto asset = i.lock(); asset) {
+               asset->saveMeta();
+           }
+       }
+    });
+
+
+    QAction* loadAllAssets = assetsMenu->addAction("Load All Assets");
+    connect(loadAllAssets, &QAction::triggered, this, []() {
+        QDirIterator it(WorkingDirectory->path(), { "*.meta" }, QDir::Files, QDirIterator::Subdirectories);
+        while(it.hasNext()) {
+            QString metaPath = it.next();
+            *LogPane << QString("Attempting load asset: %0").arg(metaPath);
+            metaPath.chop(5 /* ".meta" */);
+            AssetGraph->LoadAsset(
+                new CAsset(WorkingDirectory->relativeFilePath(metaPath))
+            );
+        }
+    });
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -36,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     buildMenu();
 
     dockManager = new ads::CDockManager(this);
-
+    //dockManager->setStyleSheet("");
 
     CTestEditor* testEditor = new CTestEditor();
     ads::CDockWidget* dockWidget3 = new ads::CDockWidget("Editor");
