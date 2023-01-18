@@ -15,6 +15,11 @@ public:
     explicit CBuildAssetDialog(QWidget *parent = nullptr);
     ~CBuildAssetDialog();
 
+private slots:
+    void on_StartBuildButton_clicked();
+
+    void on_CancelBuildButton_clicked();
+
 private:
     Ui::CBuildAssetDialog *ui;
 };
