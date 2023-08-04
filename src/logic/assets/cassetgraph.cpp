@@ -1,4 +1,5 @@
 #include "cassetgraph.h"
+#include <iostream>
 
 //
 //
@@ -37,12 +38,76 @@ void CAssetGraph::UnloadAsset(std::weak_ptr<CAsset> Asset)
     emit GraphChanged();
 }
 
+std::weak_ptr<CAsset> CAssetGraph::GetAssetByName(QString Name)
+{
+    for(auto& asset : LoadedAssets) {
+        if(asset->getName().compare(Name) == 0)
+            return asset;
+    }
+
+    return std::shared_ptr<CAsset>();
+}
+
 void CAssetGraph::ClearGraph()
 {
     LoadedAssets.clear();
     Links.clear();
     VirtualGraph.reset();
     emit GraphChanged();
+}
+
+void CAssetGraph::LoadLinksMeta()
+{
+    QFile file(WorkingDirectory->filePath("$project.meta"));
+    if(!file.exists()) {
+        SaveLinksMeta();
+        return;
+    }
+    if(!file.open(QFile::ReadOnly)) return;
+
+
+    toml::table metaTable = toml::parse(file.readAll().toStdString());
+    toml::array linksArray = *metaTable.get("links")->as_array();
+
+    for(toml::node& linkNode : linksArray) {
+        if(!linkNode.is_table())
+            continue;
+
+        QString parentName = QString::fromStdString(linkNode.as_table()->get("parent")->as_string()->get());
+        QString childName = QString::fromStdString(linkNode.as_table()->get("child")->as_string()->get());
+
+        auto parent = GetAssetByName(parentName);
+        auto child = GetAssetByName(childName);
+
+        if(parent.expired() || child.expired())
+            continue;
+
+        AddLink(parent, child);
+    }
+}
+
+void CAssetGraph::SaveLinksMeta()
+{
+    toml::table metaTable;
+    toml::array linksArray;
+
+    for(auto& kv : Links) {
+        for(auto& link : kv.second) {
+            if(link.Direction == CLink::Direction::PARENT_TO_CHILD)
+                linksArray.push_back(toml::table{
+                                         { "parent", link.parent().lock()->getName().toStdString() },
+                                         { "child", link.child().lock()->getName().toStdString() }
+                                     });
+        }
+    }
+
+    metaTable.insert("links", linksArray);
+    QFile file(WorkingDirectory->filePath("$project.meta"));
+    if(file.open(QFile::WriteOnly)) {
+        std::stringstream stream;
+        stream << metaTable;
+        file.write(stream.str().c_str());
+    }
 }
 
 QVector<CLink> CAssetGraph::GetLinksForAsset(std::weak_ptr<CAsset> Asset) const

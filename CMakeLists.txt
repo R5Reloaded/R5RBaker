@@ -36,6 +36,7 @@ set(PROJECT_SOURCES
         src/logic/assets/casset.h src/logic/assets/casset.cpp
 
 	src/logic/assets/types/crpak.h src/logic/assets/types/crpak.cpp
+	src/logic/assets/types/crmdl.h src/logic/assets/types/crmdl.cpp
 
         src/logic/models/cassetgraphmodel.h src/logic/models/cassetgraphmodel.cpp
 

@@ -34,6 +34,7 @@ void MainWindow::buildMenu()
                asset->saveMeta();
            }
        }
+       AssetGraph->SaveLinksMeta();
     });
 
 
@@ -42,12 +43,15 @@ void MainWindow::buildMenu()
         QDirIterator it(WorkingDirectory->path(), { "*.meta" }, QDir::Files, QDirIterator::Subdirectories);
         while(it.hasNext()) {
             QString metaPath = it.next();
+            if(QFileInfo(metaPath).fileName().startsWith("$")) continue; // "$" metafiles are handled separately
+
             *LogPane << QString("Attempting load asset: %0").arg(metaPath);
             metaPath.chop(5 /* ".meta" */);
             AssetGraph->LoadAsset(
                 new CAsset(WorkingDirectory->relativeFilePath(metaPath))
             );
         }
+        AssetGraph->LoadLinksMeta();
     });
 }
 

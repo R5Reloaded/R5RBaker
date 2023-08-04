@@ -72,7 +72,7 @@ QVariant CAssetGraphModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole: {
         CGraphItem* item = static_cast<CGraphItem*>(index.internalPointer());
         if(auto Asset = item->Asset.lock(); Asset.get() != nullptr)
-            return Asset->Name;
+            return Asset->getName();
         else
             return "Asset Destroyed";
     }

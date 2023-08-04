@@ -11,7 +11,8 @@ CNewAssetDialog::CNewAssetDialog(QWidget *parent) :
 
     ui->typeCombo->addItems({
                                 "CAsset*",
-                                "CRPak*"
+                                "CRPak*",
+                                "CRMdl*"
                             });
 }
 

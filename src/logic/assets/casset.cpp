@@ -1,10 +1,12 @@
 #include "casset.h"
 #include "../../windows/cassetlinksdialog.h"
+#include "../../windows/cbuildassetdialog.h"
 #include "qmetaobject.h"
 #include <QMetaObject>
 #include <QDir>
 #include <QMenu>
 #include <QVariant>
+
 
 CAsset::CAsset(QString Name, QObject *parent)
     : QObject{parent}
@@ -13,12 +15,7 @@ CAsset::CAsset(QString Name, QObject *parent)
     setObjectName(Name);
 }
 
-QString CAsset::getName() const
-{
-    return Name;
-}
-
-void CAsset::setName(const QString &newName)
+void CAsset::setName(QString newName)
 {
     if (Name == newName)
         return;
@@ -116,16 +113,22 @@ void CAsset::saveMeta()
 void CAsset::buildMenu(QMenu *Menu)
 {
     auto assetMenu = Menu->addMenu(QString("As %1").arg(metaObject()->className()));
-    auto linksMenuAction = assetMenu->addAction("View/Edit Links");
+    auto linksMenuAction = assetMenu->addAction("View/Edit Links...");
     connect(linksMenuAction, &QAction::triggered, Menu, [this]() {
-        (new CAssetLinksDialog(weak_from_this(), nullptr))->show();
+        CAssetLinksDialog dialog(weak_from_this(), nullptr);
+        dialog.exec();
+    });
+
+    auto buildAssetAction = assetMenu->addAction("Build...");
+    connect(buildAssetAction, &QAction::triggered, Menu, [this]() {
+        CBuildAssetDialog dialog(weak_from_this(), nullptr);
+        dialog.exec();
     });
 
     auto unloadAssetAction = assetMenu->addAction("Unload");
     connect(unloadAssetAction, &QAction::triggered, Menu, [this]() {
         AssetGraph->UnloadAsset(weak_from_this());
     });
-
 
     _buildMenu(assetMenu);
 }

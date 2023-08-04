@@ -8,7 +8,7 @@ class CRPak : public CAsset
 {
     Q_OBJECT
 public:
-    explicit CRPak(QString Name, QObject *parent = nullptr);
+    Q_INVOKABLE explicit CRPak(QString Name, QObject *parent = nullptr);
     // CAsset interface
 private:
     void _buildMenu(QMenu *Menu) override;

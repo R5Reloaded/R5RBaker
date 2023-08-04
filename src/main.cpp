@@ -1,3 +1,5 @@
+#include "logic/assets/types/crmdl.h"
+#include "logic/assets/types/crpak.h"
 #include "windows/mainwindow.h"
 
 #include <QApplication>
@@ -44,9 +46,12 @@ int main(int argc, char *argv[])
     AssetGraph = new CAssetGraph();
 
 
+    qRegisterMetaType<std::shared_ptr<CAsset>>("std::shared_ptr<CAsset>");
+    qRegisterMetaType<std::weak_ptr<CAsset>>("std::weak_ptr<CAsset>");
+
     qRegisterMetaType<CAsset*>();
-    qRegisterMetaType<std::shared_ptr<CAsset>>("std::shared_ptr<MyClass>");
-    qRegisterMetaType<std::weak_ptr<CAsset>>("std::weak_ptr<MyClass>");
+    qRegisterMetaType<CRPak*>();
+    qRegisterMetaType<CRMdl*>();
 
     MainWindow w;
     w.show();

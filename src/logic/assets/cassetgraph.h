@@ -87,11 +87,13 @@ public:
 
     std::weak_ptr<CAsset> LoadAsset(CAsset* Asset);
     void UnloadAsset(std::weak_ptr<CAsset> Asset);
+    std::weak_ptr<CAsset> GetAssetByName(QString Name);
 
 
     QVector<CLink> GetLinksForAsset(std::weak_ptr<CAsset> Asset) const;
     QVector<CLink> GetChildrenLinksForAsset(std::weak_ptr<CAsset> Asset) const;
     QVector<CLink> GetParentsLinksForAsset(std::weak_ptr<CAsset> Asset) const;
+
 
 
     QVector<std::weak_ptr<CAsset>> GetRootAssets() const;
@@ -108,6 +110,9 @@ public:
     std::shared_ptr<CGraphItem> MakeGraphItemForAsset(std::weak_ptr<CAsset> Asset, std::shared_ptr<CGraphItem> Parent);
 
     void ClearGraph();
+
+    void LoadLinksMeta();
+    void SaveLinksMeta();
 signals:
     void GraphChanged();
     void VirtualGraphAboutToBeRebuilt();

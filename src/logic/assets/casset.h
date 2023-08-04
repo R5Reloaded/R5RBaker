@@ -8,14 +8,11 @@ class CAsset : public QObject, public std::enable_shared_from_this<CAsset>, publ
 {
     Q_OBJECT
 
+    ASSET_META_PROPERTY_CUSTOM_SETTER(QString, Name)
+    ASSET_META_PROPERTY(bool, usePhysics)
+    ASSET_META_PROPERTY(bool, isStatic)
 public:
     Q_INVOKABLE explicit CAsset(QString Name, QObject *parent = nullptr);
-
-    QString Name;
-
-    QString getName() const;
-    void setName(const QString &newName);
-
 
     virtual void buildBeforeChildren(){}
     virtual void buildAfterChildren(){}
@@ -25,7 +22,6 @@ public:
     void deleteMeta();
     void moveMeta(QString newPath);
 
-
     QString getMetaPath();
 
     virtual void buildMenu(class QMenu* Menu) final override;
@@ -34,11 +30,9 @@ public:
 
 
 private:
-    Q_PROPERTY(QString Name READ getName WRITE setName NOTIFY NameChanged)
 
     virtual void _buildMenu(QMenu* Menu){}
 signals:
-    void NameChanged();
 
 };
 

@@ -1,6 +1,9 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include <QDir>
+#include <toml++/toml.h>
+
 #include "utils/globals.h"
 
 #include "interfaces/IHasProperties.h"
@@ -15,5 +18,4 @@
 
 #include "panes/clogpane.h"
 
-#include <toml++/toml.h>
 #endif // PCH_H

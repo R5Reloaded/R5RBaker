@@ -16,7 +16,7 @@ CAssetLinksDialog::CAssetLinksDialog(std::weak_ptr<CAsset> AssetPtr, QWidget *pa
         return;
     }
 
-    setWindowTitle(QString("%1 Links").arg(Asset->Name));
+    setWindowTitle(QString("%1 Links").arg(Asset->getName()));
     setModal(true);
 
     refreshChildrenGroup();
@@ -43,7 +43,7 @@ void CAssetLinksDialog::refreshChildrenGroup()
         if(link.parent().lock().get() == Asset.get() && link.child().lock()) {
             auto child = link.child().lock();
 
-            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(child->Name, child->metaObject()->className()));
+            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(child->getName(), child->metaObject()->className()));
             item->setData(Qt::UserRole, QVariant::fromValue(link.child()));
             ui->ChildrenListWidget->addItem(item);
         }
@@ -58,7 +58,7 @@ void CAssetLinksDialog::refreshChildrenGroup()
         if(otherAsset == Asset || AssetGraph->AreLinked(otherAsset, Asset))
             continue;
 
-        ui->AddChildCombo->addItem(QString("%1: [%2]").arg(otherAsset->Name, otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
+        ui->AddChildCombo->addItem(QString("%1: [%2]").arg(otherAsset->getName(), otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
     }
 
 }
@@ -78,7 +78,7 @@ void CAssetLinksDialog::refreshParentsGroup()
         if(link.child().lock().get() == Asset.get() && link.parent().lock()) {
             auto parent = link.parent().lock();
 
-            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(parent->Name, parent->metaObject()->className()));
+            QListWidgetItem* item = new QListWidgetItem(QString("%1: [%2]").arg(parent->getName(), parent->metaObject()->className()));
             item->setData(Qt::UserRole, QVariant::fromValue(link.parent()));
             ui->ParentsListWidget->addItem(item);
         }
@@ -93,7 +93,7 @@ void CAssetLinksDialog::refreshParentsGroup()
         if(otherAsset == Asset || AssetGraph->AreLinked(otherAsset, Asset))
             continue;
 
-        ui->AddParentCombo->addItem(QString("%1: [%2]").arg(otherAsset->Name, otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
+        ui->AddParentCombo->addItem(QString("%1: [%2]").arg(otherAsset->getName(), otherAsset->metaObject()->className()), QVariant::fromValue(assetPtr));
     }
 }
 
